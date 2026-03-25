@@ -1,0 +1,30 @@
+
+#Development environment/properties configuration
+
+server:
+  port: 8083
+
+
+
+#  Database configuration
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/authdb
+    username: admin
+    password: admin
+
+   #    hikari:
+    #      pool-name: HikariCP
+    #      maximum-pool-size: 5
+    #      connection-timeout: 10000
+    #      idle-timeout: 600000
+    #      max-lifetime: 1800000
+    #      validation-timeout: 1800000
+    #      leak-detection-threshold: 0
+    #      initialization-fail-timeout: -1
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true

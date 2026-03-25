@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: auth-app-backend
+  profiles:
+    active: dev
+
+server:
+  port: 8082
+
+
+#// Configuration//
+# Database configuration
+
+
+
+#Email Configuration
+
+#oauth2 Configuration
+
+
+

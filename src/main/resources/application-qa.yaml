@@ -1,0 +1,4 @@
+
+#Testing environment/properties configuration
+server:
+  port: 8081

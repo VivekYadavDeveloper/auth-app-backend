@@ -1,0 +1,27 @@
+services:
+  auth-db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+
+  auth-app:
+    build: .
+    depends_on:
+      - auth-db
+    ports:
+      - "8083:8083"
+    environment:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/authdb
+        SPRING_DATASOURCE_USERNAME: admin
+        SPRING_DATASOURCE_PASSWORD: admin
+
+
+volumes:
+    auth-db-data:
