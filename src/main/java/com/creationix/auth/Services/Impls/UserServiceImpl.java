@@ -1,4 +1,4 @@
-package com.creationix.auth.Services;
+package com.creationix.auth.Services.Impls;
 
 import com.creationix.auth.Dto.UserDto;
 import com.creationix.auth.Entities.Provider;
@@ -6,6 +6,7 @@ import com.creationix.auth.Entities.User;
 import com.creationix.auth.Exception.ResourceNotFoundException;
 import com.creationix.auth.Helper.UserHelper;
 import com.creationix.auth.Repositories.UserRepository;
+import com.creationix.auth.Services.UserServices;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
