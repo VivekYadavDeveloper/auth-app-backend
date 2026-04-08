@@ -2,7 +2,9 @@ package com.creationix.auth.Security;
 
 import com.creationix.auth.Helper.UserHelper;
 import com.creationix.auth.Repositories.UserRepository;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -86,16 +88,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     });
                 }
             } catch (ExpiredJwtException e) {
-                e.printStackTrace();
-            } catch (MalformedJwtException e) {
-                e.printStackTrace();
-            } catch (JwtException e) {
-                e.printStackTrace();
+                request.setAttribute("error", "Token is expired");
+//                e.printStackTrace();
             } catch (Exception e) {
-                e.printStackTrace();
+                request.setAttribute("error", "Invalid token");
+//                e.printStackTrace();
             }
 
         }
         filterChain.doFilter(request, response);
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        return path.startsWith("/api/v1/auth/login") || path.startsWith("/api/v1/auth/register");
+    }
+
 }
