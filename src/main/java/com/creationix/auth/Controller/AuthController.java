@@ -7,8 +7,10 @@ import com.creationix.auth.Entities.RefreshToken;
 import com.creationix.auth.Entities.User;
 import com.creationix.auth.Repositories.RefreshTokenRepository;
 import com.creationix.auth.Repositories.UserRepository;
+import com.creationix.auth.Security.CookiesService;
 import com.creationix.auth.Security.JwtService;
 import com.creationix.auth.Services.AuthServices;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -37,9 +39,11 @@ public class AuthController {
     private final JwtService jwtService;
     private final ModelMapper mapper;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final CookiesService cookiesService;
+
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
 
         /*AUTHENTICATE*/
         Authentication authentication = authenticate(loginRequest);
@@ -65,6 +69,11 @@ public class AuthController {
         /*IF USER IS ENABLED HERE WE GENERATE ACCESS JWT TOKEN*/
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user, refreshTokenOB.getJti());
+
+        /*USE COOKIE SERVICE TO ATTACH REFRESH TOKEN IN COOKIE*/
+        cookiesService.attachRefreshCookie(response, refreshToken, (int) jwtService.getRefreshTtlSecond());
+        cookiesService.addNoStoreHeaders(response);
+
         TokenResponse tokenResponse = TokenResponse.of(accessToken, refreshToken, jwtService.getAccessTtlSecond(), mapper.map(user, UserDto.class));
         return ResponseEntity.ok(tokenResponse);
     }
