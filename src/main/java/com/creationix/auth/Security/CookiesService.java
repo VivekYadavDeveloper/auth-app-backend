@@ -71,6 +71,6 @@ public class CookiesService {
     /*NO CACHE HEADER STORE*/
     public void addNoStoreHeaders(HttpServletResponse response) {
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
-        response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+        response.setHeader("Pragma", "no-cache");
     }
 }
