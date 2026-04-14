@@ -38,10 +38,19 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID:your-google-client-id}
             client-secret: ${GOOGLE_CLIENT_SECRET:your-google-client-secret}
+            #{base-url}/login/oauth2/code/google{registrationId}
             scope:
               - email
               - profile
               - openid
+
+          github:
+            client-id: ${GITHUB_CLIENT_ID:your-github-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:your-github-client-secret}
+            #            {base-url}/login/oauth2/code/github{registrationId}
+            scope:
+              - read:user
+              - user:email
 
 logging:
   level:
@@ -61,4 +70,8 @@ security:
     cookie-domain: ${JWT_COOKIE_DOMAIN:localhost}
 
 
-
+app:
+  auth:
+    frontend:
+      success-redirect: http://localhost:5100/auth/success
+      failure-redirect: http://localhost:5100/auth/failure

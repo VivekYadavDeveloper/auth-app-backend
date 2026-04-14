@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.UUID;
 
+
 @Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
@@ -30,6 +32,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final JwtService jwtService;
     private final CookiesService cookieService;
     private final RefreshTokenRepository refreshTokenRepository;
+
+    @Value("${app.auth.frontend.success-redirect}")
+    private String frontEndSuccessUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -56,20 +61,36 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 String name = oAuth2User.getAttributes().getOrDefault("name", "").toString();
                 String picture = oAuth2User.getAttributes().getOrDefault("picture", "").toString();
 
-                user = User.builder()
+                User newUser = User.builder()
                         .email(email)
                         .name(name)
                         .image(picture)
                         .enabled(true)
                         .provider(Provider.GOOGLE)
+                        .providerId(googleId)
                         .build();
 
-                userRepository.findByEmail(email)
-                        .ifPresentOrElse(user1 -> {
-                            logger.info("User already exists with email: {}", email);
-                            logger.info(user1.toString());
+                user = userRepository.findByEmail(email).orElseGet(() -> userRepository.save(newUser));
+            }
+            case "github" -> {
+                String name = oAuth2User.getAttributes().getOrDefault("login", "").toString();
+                String githubId = oAuth2User.getAttributes().getOrDefault("id", "").toString();
+                String image = oAuth2User.getAttributes().getOrDefault("avatar_url", "").toString();
+                String email = (String) oAuth2User.getAttributes().get("email");
 
-                        }, () -> userRepository.save(user));
+                if (email == null) {
+                    email = name + "@github.com";
+                }
+                User newUser = User.builder()
+                        .email(email)
+                        .name(name)
+                        .image(image)
+                        .enabled(true)
+                        .provider(Provider.GITHUB)
+                        .providerId(githubId)
+                        .build();
+                user = userRepository.findByEmail(email).orElseGet(() -> userRepository.save(newUser));
+
             }
 
             default -> {
@@ -77,6 +98,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 throw new RuntimeException("Unsupported authentication provider: " + registrationId); // ✅ throw so compiler knows user is always assigned
             }
         }
+
+
+
         /* GENERATE NEW REFRESH TOKEN WHAT IT'LL DO IT GIVES/GENERATE NEW ACCESS TOKEN*/
         /* ✅ user is accessible here now*/
 
@@ -96,5 +120,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         cookieService.attachRefreshCookie(response, refreshToken, (int) jwtService.getRefreshTtlSecond());
         /*TO CHECK THE OAUTH2 IS WORKING OR NOT USE THIS URL FOR GOOGLE LOGIN "http://localhost:8083/oauth2/authorization/google"*/
         response.getWriter().write("Authentication successful. You can close this window and return to the application.");
+        response.sendRedirect(frontEndSuccessUrl);
     }
 }
