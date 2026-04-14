@@ -19,6 +19,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import tools.jackson.databind.ObjectMapper;
 
+import static com.creationix.auth.Config.AppConstants.AUTH_PUBLIC_URLS;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -49,10 +51,10 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/register").permitAll()
-                        .requestMatchers("/api/v1/auth/login").permitAll()
-                        .requestMatchers("/api/v1/auth/refresh").permitAll()
-                        .requestMatchers("/api/v1/auth/logout").permitAll()
+                        .requestMatchers(AUTH_PUBLIC_URLS).permitAll()
+//                        .requestMatchers("/api/v1/auth/login").permitAll()
+//                        .requestMatchers("/api/v1/auth/refresh").permitAll()
+//                        .requestMatchers("/api/v1/auth/logout").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oAuth2 -> oAuth2.successHandler(successHandler).failureHandler(null)).logout(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(((request, response, authException) -> {
