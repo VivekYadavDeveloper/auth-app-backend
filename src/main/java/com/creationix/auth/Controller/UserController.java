@@ -1,11 +1,12 @@
 package com.creationix.auth.Controller;
 
+import com.creationix.auth.Config.AppConstants;
 import com.creationix.auth.Dto.UserDto;
 import com.creationix.auth.Services.UserServices;
 import lombok.AllArgsConstructor;
-import org.hibernate.boot.internal.Abstract;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,6 +35,8 @@ public class UserController {
     }
 
     /*GET USER BY ID API CONTROLLER*/
+    /*HANDLE METHOD LEVEL SECURITY BASED ON ROLE*/
+    @PreAuthorize("hasRole('" + AppConstants.ADMIN_ROLE + "')")
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getUserById(@PathVariable String userId) {
         return ResponseEntity.ok(userServices.getUserById(userId));

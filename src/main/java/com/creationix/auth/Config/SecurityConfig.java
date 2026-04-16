@@ -4,10 +4,12 @@ import com.creationix.auth.Dto.ApiError;
 import com.creationix.auth.Security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -23,6 +25,7 @@ import static com.creationix.auth.Config.AppConstants.AUTH_PUBLIC_URLS;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -52,26 +55,44 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(AUTH_PUBLIC_URLS).permitAll()
+                        .requestMatchers(HttpMethod.GET).hasRole(AppConstants.GUEST_ROLE)
+                        .requestMatchers("/api/v1/users/**").hasRole(AppConstants.ADMIN_ROLE)
 //                        .requestMatchers("/api/v1/auth/login").permitAll()
 //                        .requestMatchers("/api/v1/auth/refresh").permitAll()
 //                        .requestMatchers("/api/v1/auth/logout").permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest()
+                        .authenticated())
                 .oauth2Login(oAuth2 -> oAuth2.successHandler(successHandler).failureHandler(null)).logout(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(((request, response, authException) -> {
-                    response.setStatus(401);
-                    response.setContentType("application/json");
-                    String message = authException.getMessage();
+                .exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
+                                    response.setStatus(401);
+                                    response.setContentType("application/json");
+                                    String message = authException.getMessage();
 
-                    String error = (String) request.getAttribute("error");
-                    if (error != null) {
-                        message = error;
-                    }
-                    /*37:19*/
+                                    String error = (String) request.getAttribute("error");
+                                    if (error != null) {
+                                        message = error;
+                                    }
+                                    /*37:19*/
 //                    Map<String, Object> errorMap = Map.of("message", message, "statusCode", 401);
-                    var apiError = ApiError.of(HttpStatus.UNAUTHORIZED.value(), request.getRequestURI(), "Unauthorized Access", message);
-                    var objectMapper = new ObjectMapper();
-                    response.getWriter().write(objectMapper.writeValueAsString(apiError));
-                }))).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                                    var apiError = ApiError.of(HttpStatus.UNAUTHORIZED.value(), request.getRequestURI(), "Unauthorized Access", message);
+                                    var objectMapper = new ObjectMapper();
+                                    response.getWriter().write(objectMapper.writeValueAsString(apiError));
+                                }
+                        ).accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(403);
+                            response.setContentType("application/json");
+                            String message = accessDeniedException.getMessage();
+                            String error = (String) request.getAttribute("error");
+                            if (error != null) {
+                                message = error;
+                            }
+                            var apiError = ApiError.of(HttpStatus.FORBIDDEN.value(), request.getRequestURI(), "Forbidden Access", message);
+                            var objectMapper = new ObjectMapper();
+                            response.getWriter().write(objectMapper.writeValueAsString(apiError));
+                        })
+
+
+                ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

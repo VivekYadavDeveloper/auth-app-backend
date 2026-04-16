@@ -14,6 +14,7 @@ public class AuthServiceImpl implements AuthServices {
     private final UserServices userServices;
     private final PasswordEncoder passwordEncoder;
 
+
     @Override
     public UserDto registerUser(UserDto userDto) {
         /*Encode the simple password*/

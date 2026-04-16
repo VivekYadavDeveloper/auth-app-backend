@@ -1,10 +1,13 @@
 package com.creationix.auth.Services.Impls;
 
+import com.creationix.auth.Config.AppConstants;
 import com.creationix.auth.Dto.UserDto;
 import com.creationix.auth.Entities.Provider;
+import com.creationix.auth.Entities.Role;
 import com.creationix.auth.Entities.User;
 import com.creationix.auth.Exception.ResourceNotFoundException;
 import com.creationix.auth.Helper.UserHelper;
+import com.creationix.auth.Repositories.RoleRepository;
 import com.creationix.auth.Repositories.UserRepository;
 import com.creationix.auth.Services.UserServices;
 import jakarta.transaction.Transactional;
@@ -12,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 @Service
@@ -20,6 +24,7 @@ public class UserServiceImpl implements UserServices {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final RoleRepository roleRepository;
 
     @Override
     @Transactional
@@ -37,6 +42,13 @@ public class UserServiceImpl implements UserServices {
 
         /*Role assign here to user for authorization*/
         /*TODO: Assign Here*/
+        /*ASSIGN DEFAULT ROLE*/
+        Role role = roleRepository.findByName("ROLE_" + AppConstants.GUEST_ROLE).orElse(null);
+        if (user.getRoles() == null) {
+            user.setRoles(new HashSet<>());
+        }
+        user.getRoles().add(role);
+
         User savedUser = userRepository.save(user);
         return modelMapper.map(savedUser, UserDto.class);
     }

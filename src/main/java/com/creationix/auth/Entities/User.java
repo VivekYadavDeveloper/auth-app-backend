@@ -33,12 +33,9 @@ public class User implements UserDetails {
     private boolean enabled = true;
     private Instant createdAt = Instant.now();
     private Instant updateAt = Instant.now();
-//    private String gender;
-//    private Address address;
 
     /*Provider help to let know user login from (Eg: GOOGLE,EMAIL/LOCAL)*/
     /*Provider by default put local*/
-
     @Enumerated(EnumType.STRING)
     private Provider provider = Provider.LOCAL;
     private String providerId;
