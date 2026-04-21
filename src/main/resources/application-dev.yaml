@@ -71,7 +71,9 @@ security:
 
 
 app:
+  cors:
+    front-end-url: http://localhost:3000
   auth:
     frontend:
-      success-redirect: http://localhost:5100/auth/success
-      failure-redirect: http://localhost:5100/auth/failure
+      success-redirect: http://localhost:3000/auth/success
+      failure-redirect: http://localhost:3000/auth/failure
