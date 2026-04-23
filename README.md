@@ -1,6 +1,6 @@
-# 🔐 Full Stack Authentication App — React + Vite + Spring Boot
+# 🔐 Full Stack Authentication App — React(NextJs) + Spring Boot
 
-A complete **authentication system** built using **React (Vite)** on the frontend and **Spring Boot** on the backend.  
+A complete **authentication system** built using **React (NextJs 16)** on the frontend and **Spring Boot** on the backend.  
 Supports **JWT-based authentication** with **username/password login**, as well as **Google** and **GitHub OAuth2 login**.
 
 ---
@@ -9,17 +9,18 @@ Supports **JWT-based authentication** with **username/password login**, as well 
 
 ### 🖥️ Frontend
 
-- React (Vite)
+- React (Next.Js 16+)
 - Tailwind CSS
+- Typescript
 - Axios
-- React Router DOM
+- Zustand (state management)
 - ShadCN UI (optional)
 
 ### ⚙️ Backend
 
-- Spring Boot 3.x
+- Spring Boot 4.x
 - Spring Security 6.x
-- Spring Data JPA (MySQL)
+- Spring Data JPA (MySQL(Optional), PostgreSQL)
 - OAuth2 Client (Google, GitHub)
 - JWT Authentication
 - Lombok + HikariCP
@@ -58,10 +59,10 @@ auth-app-boot-react/
 │   ├── pom.xml
 │   └── application.yml
 │
-├── frontend/                 # React + Vite Frontend
+├── frontend/                 # NextJs Frontend
 │   ├── src/
 │   ├── package.json
-│   └── vite.config.js
+│   └── next.config.js
 │
 └── README.md
 ```
@@ -156,7 +157,7 @@ auth-app-boot-react/
 
 ---
 
-## 💻 Frontend Setup (React + Vite)
+## 💻 Frontend Setup (Next.Js)
 
 ### 🧩 Prerequisites
 
@@ -180,7 +181,7 @@ auth-app-boot-react/
 3. Create `.env` file inside `frontend/`:
 
    ```bash
-   VITE_BACKEND_URL=http://localhost:8081
+   NEXT_BACKEND_URL=http://localhost:3000
    ```
 
 4. Start development server:
@@ -188,7 +189,7 @@ auth-app-boot-react/
    npm run dev
    ```
 
-📍 Frontend runs on **http://localhost:5173**
+📍 Frontend runs on **http://localhost:3000**
 
 ---
 
@@ -232,13 +233,13 @@ auth-app-boot-react/
 ## 🧠 Environment Variables Summary
 
 | Variable               | Description              | Example                            |
-| ---------------------- | ------------------------ |------------------------------------|
+|------------------------| ------------------------ |------------------------------------|
 | `JWT_SECRET`           | Secret key for JWT       | `random-long-secret`               |
 | `GOOGLE_CLIENT_ID`     | Google OAuth client ID   | `xxxxx.apps.googleusercontent.com` |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth secret      | `xxxxxx`                           |
 | `GITHUB_CLIENT_ID`     | GitHub OAuth client ID   | `ghp_xxxxx`                        |
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth secret      | `ghs_xxxxx`                        |
-| `VITE_BACKEND_URL`     | Backend URL for frontend | `http://localhost:8081             |
+| `NEXT_BACKEND_URL`     | Backend URL for frontend | `http://localhost:3000             |
 
 ---
 
@@ -264,7 +265,7 @@ auth-app-boot-react/
 - For separate deployment:
     - Host frontend on Netlify/Vercel.
     - Host backend on Render/AWS/DigitalOcean.
-    - Update `VITE_BACKEND_URL` to production backend URL.
+    - Update `NEXT_BACKEND_URL` to production backend URL.
 - Use HTTPS and set cookies with `secure` and `SameSite=Lax`.
 
 ---
@@ -283,4 +284,4 @@ You are free to use, modify, and distribute it for learning and educational purp
 
 ---
 
-⭐ **If this project helped you, consider giving it a sstar!**
+⭐ **If this project helped you, consider giving it a star!**
